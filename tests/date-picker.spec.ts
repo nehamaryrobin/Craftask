@@ -1,0 +1,52 @@
+import { test, expect } from '@playwright/test';
+
+test('calendar selection, month navigation, text entry and outside dismissal', async ({page}) => {
+  await page.clock.setFixedTime(new Date('2026-09-17T12:00:00'));
+  await page.goto('http://127.0.0.1:3000');
+  await page.getByRole('button',{name:'Add task',exact:true}).click();
+  await page.getByRole('textbox',{name:'Task name'}).fill('Buy supplies for the road trip');
+  await page.getByRole('button',{name:'Task date',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Today Thu',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'September 22, 2026',exact:true}).click();
+  await expect(page.getByRole('button',{name:'September 22, 2026',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.composer-date-highlight')).toHaveText('22 Sept');
+  await page.screenshot({path:'/private/tmp/craftask-calendar-desktop.png',fullPage:true});
+  await page.getByRole('heading',{name:'Inbox',exact:true}).click();
+  await expect(page.getByRole('textbox',{name:'Type a date'})).not.toBeVisible();
+  await expect(page.getByRole('button',{name:'Task date: Sep 22'})).toHaveText('Tuesday');
+  await page.getByRole('button',{name:'Task date: Sep 22'}).click();
+  await page.getByRole('button',{name:'Next month',exact:true}).click();
+  await page.getByRole('button',{name:'October 15, 2026',exact:true}).click();
+  await page.getByRole('textbox',{name:'Type a date'}).fill('2026-02-30');
+  await page.getByRole('button',{name:'Apply typed date'}).click();
+  await expect(page.locator('.date-error')).toBeVisible();
+  await page.getByRole('textbox',{name:'Type a date'}).fill('22 Sep');
+  await page.getByRole('textbox',{name:'Type a date'}).press('Enter');
+  await expect(page.getByRole('button',{name:'September 22, 2026',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'Time',exact:true}).click();
+  await page.getByLabel('Task time',{exact:true}).fill('14:30');
+  await page.getByRole('heading',{name:'Inbox',exact:true}).click();
+  await page.getByRole('button',{name:'Save task'}).click();
+  await expect(page.getByText('Buy supplies for the road trip',{exact:true})).toBeVisible();
+  await expect(page.getByText('2026-09-22',{exact:true})).toBeVisible();
+  await expect(page.getByText('14:30',{exact:true})).toBeVisible();
+});
+
+test('mobile quick dates and clearing',async({page})=>{
+  await page.clock.setFixedTime(new Date('2026-09-17T12:00:00'));
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('http://127.0.0.1:3000');
+  await page.getByRole('button',{name:'Add task',exact:true}).click();
+  await page.getByRole('button',{name:'Task date',exact:true}).click();
+  await page.getByRole('button',{name:'Tomorrow Fri',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Task date: Sep 18'})).toHaveText('Tomorrow');
+  await page.screenshot({path:'/private/tmp/craftask-calendar-mobile.png',fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+  const bounds=await page.locator('.date-picker').boundingBox();
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);
+  expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(390);
+  await page.getByRole('button',{name:'No date',exact:true}).click();
+  await expect(page.locator('.composer-date-highlight')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Task date',exact:true})).toBeVisible();
+});

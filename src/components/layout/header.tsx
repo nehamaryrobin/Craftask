@@ -1,0 +1,9 @@
+'use client';
+import { Bell, Search, Plus, Menu, Sun, CheckCheck } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+export function Header({search,add,menu}:{search:()=>void;add:()=>void;menu:()=>void}) {
+ const [read,setRead]=useState(false);
+ return <><header className="topbar"><div className="breadcrumb"><button className="icon-button mobile-menu" onClick={menu} aria-label="Open menu"><Menu size={20}/></button><span>My workspace</span><span className="breadcrumb-slash">/</span><strong>Your daily space</strong></div><div className="header-tools"><span className="local-tag"><span/>Personal workspace</span><button className="icon-button" onClick={search} aria-label="Search tasks"><Search size={19}/></button><Popover><PopoverTrigger asChild><button className="icon-button notification-button" aria-label="Notifications"><Bell size={19}/>{!read&&<span/>}</button></PopoverTrigger><PopoverContent align="end" className="notification-popover"><h3>Your gentle reminders</h3><p>{read?'You’re all caught up.':'Your design assignment is due tomorrow. A little progress today will help.'}</p>{!read&&<Button variant="outline" size="sm" onClick={()=>setRead(true)}><CheckCheck size={14}/>Mark as read</Button>}</PopoverContent></Popover><span className="header-divider"/><span className="avatar header-avatar">N</span></div></header><div className="greeting"><div><div className="date-line"><Sun size={15}/>{new Intl.DateTimeFormat('en',{weekday:'long',month:'long',day:'numeric'}).format(new Date())}</div><h1>Good morning, Neha <span className="greeting-sun">☀</span></h1><p>A fresh start. A clear mind. Let’s make today yours.</p></div><Button className="add-task-button" onClick={add}><Plus size={17}/>Add task</Button></div></>;
+}

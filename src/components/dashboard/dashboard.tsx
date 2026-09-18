@@ -1,0 +1,26 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, Search, Sparkles } from 'lucide-react';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/layout/header';
+import { TaskList } from './task-list';
+import { SummaryCards, Deadlines, HabitsCard, WeeklyProgress } from './overview-cards';
+import { InboxView } from '@/components/inbox/inbox-view';
+import { TaskDialog } from './task-dialog';
+import { SecondaryView } from './secondary-view';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { initialTasks, initialHabits } from '@/data/mock-data';
+import type { Task, View } from '@/types/task';
+import { cn } from '@/lib/utils';
+export function Dashboard() {
+ const [tasks,setTasks]=useState(initialTasks);const [habits,setHabits]=useState(initialHabits);const [view,setView]=useState<View>('Inbox');const [collapsed,setCollapsed]=useState(false);const [mobileOpen,setMobileOpen]=useState(false);const [addOpen,setAddOpen]=useState(false);const [searchOpen,setSearchOpen]=useState(false);const [query,setQuery]=useState('');const [announcement,setAnnouncement]=useState('');
+ useEffect(()=>{const handler=(event:KeyboardEvent)=>{if((event.metaKey||event.ctrlKey)&&event.key==='k'){event.preventDefault();setSearchOpen(true);}};window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);},[]);
+ const [inboxComposing,setInboxComposing]=useState(false);
+ const openAdd=()=>{if(view==='Inbox') {setInboxComposing(true);setMobileOpen(false);} else setAddOpen(true);};
+ const toggle=(id:string)=>{setTasks(prev=>prev.map(t=>t.id===id?{...t,completed:!t.completed}:t));};
+ const toggleHabit=(id:string)=>setHabits(prev=>prev.map(h=>h.id===id?{...h,done:!h.done}:h));
+ const today=tasks.filter(t=>t.due==='today');const completed=today.filter(t=>t.completed).length;
+ const add=(task:Task)=>{setTasks(prev=>[task,...prev]);setAnnouncement(`Added: ${task.title}`);};
+ return <div className={cn('app-shell',collapsed&&'sidebar-is-collapsed')}><a className="skip-link" href="#main">Skip to content</a><Sidebar view={view} setView={setView} collapsed={collapsed} toggle={()=>setCollapsed(!collapsed)} search={()=>setSearchOpen(true)} add={openAdd} count={today.length-completed} mobileOpen={mobileOpen} closeMobile={()=>setMobileOpen(false)}/><main id="main" className="main-content">{view==='Inbox'?<InboxView tasks={tasks} composing={inboxComposing} setComposing={setInboxComposing} add={add} toggle={toggle} openMenu={()=>setMobileOpen(true)} search={()=>setSearchOpen(true)}/>:<><Header search={()=>setSearchOpen(true)} add={openAdd} menu={()=>setMobileOpen(true)}/><div className="workspace-content">{view==='Today'?<><SummaryCards completed={completed} total={today.length} habitCount={habits.filter(h=>h.done).length} priorities={today.filter(t=>!t.completed&&t.priority==='high').length}/><div className="section-title"><div><span className="section-kicker">YOUR DAY, AT A GLANCE</span><h2>A little structure. More headspace.</h2></div><span className="today-pill"><span/>Today</span></div><div className="dashboard-grid"><div className="main-column"><TaskList tasks={today} toggle={toggle} add={openAdd}/><WeeklyProgress navigate={setView} completed={completed}/></div><div className="aside-column"><Deadlines tasks={tasks} navigate={setView}/><HabitsCard habits={habits} toggle={toggleHabit} navigate={setView}/><button className="focus-note" onClick={()=>setView('Eisenhower Matrix')}><Sparkles size={20}/><span><strong>Busy isn’t always productive.</strong><small>Find your focus with the Eisenhower Matrix.</small></span><ArrowUpRight size={18}/></button></div></div></>:<><div className="view-heading"><span className="section-kicker">YOUR PERSONAL WORKSPACE</span><h2>{view}</h2></div><SecondaryView view={view} tasks={tasks} toggle={toggle} add={openAdd} habits={habits} toggleHabit={toggleHabit} navigate={setView}/></>}<footer className="page-footer"><span>Made for progress, not perfection.</span><span>One day at a time <span className="footer-flower">✳</span></span></footer></div></>}</main><TaskDialog open={addOpen} onOpenChange={setAddOpen} add={add}/><Dialog open={searchOpen} onOpenChange={setSearchOpen}><DialogContent className="craft-dialog search-dialog"><DialogHeader><DialogTitle>Find your next thing</DialogTitle><DialogDescription>Search tasks across your workspace.</DialogDescription></DialogHeader><div className="search-input-wrap"><Search size={18}/><Input placeholder="Search tasks…" value={query} onChange={e=>setQuery(e.target.value)} aria-label="Search tasks"/></div><div className="search-results">{tasks.filter(t=>t.title.toLowerCase().includes(query.toLowerCase())).map(t=><button key={t.id} onClick={()=>{setView(t.project==='Inbox'?'Inbox':t.due==='today'?'Today':t.due==='inbox'?'Inbox':'Upcoming');setSearchOpen(false);}}><span>{t.title}</span><small>{t.project} · {t.completed?'Completed':t.due}</small></button>)}{!tasks.some(t=>t.title.toLowerCase().includes(query.toLowerCase()))&&<p>No tasks found. Try a different search.</p>}</div></DialogContent></Dialog><span role="status" className="sr-only">{announcement}</span></div>;
+}

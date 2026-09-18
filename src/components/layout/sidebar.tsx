@@ -1,0 +1,18 @@
+'use client';
+import { Search, Inbox, Sun, CalendarDays, LayoutGrid, Columns3, CalendarRange, Sprout, Calendar, ChartNoAxesCombined, Settings, PanelLeftClose, PanelLeftOpen, ChevronDown, Plus, Check, X } from 'lucide-react';
+import Link from 'next/link';
+import type { View } from '@/types/task';
+import { cn } from '@/lib/utils';
+const sections = [
+  { label: 'WORKSPACE', items: [{ name: 'Inbox', icon: Inbox }, { name: 'Today', icon: Sun }, { name: 'Upcoming', icon: CalendarDays }] },
+  { label: 'MAKE SPACE FOR WHAT MATTERS', items: [{ name: 'Eisenhower Matrix', icon: LayoutGrid }, { name: 'Weekly Plan', icon: Columns3 }, { name: 'Monthly Plan', icon: CalendarRange }, { name: 'Habits', icon: Sprout }, { name: 'Calendar', icon: Calendar }] },
+  { label: 'REFLECT & REFINE', items: [{ name: 'Reports', icon: ChartNoAxesCombined }, { name: 'Settings', icon: Settings }] },
+];
+export function Sidebar({ view, setView, collapsed, toggle, search, add, count, mobileOpen, closeMobile }: { view: View; setView: (v: View) => void; collapsed: boolean; toggle: () => void; search: () => void; add: () => void; count: number; mobileOpen: boolean; closeMobile: () => void }) {
+  return <><button className={cn('mobile-scrim', mobileOpen && 'visible')} onClick={closeMobile} aria-label="Close navigation" tabIndex={mobileOpen ? 0 : -1} /><aside className={cn('sidebar', collapsed && 'collapsed', mobileOpen && 'mobile-open')}>
+    <div className="brand-row"><Link href="/" className="brand" aria-label="Craftask home"><span className="brand-mark"><Check size={21} strokeWidth={3} /></span><span className="sidebar-label">craftask<span className="brand-dot">.</span></span></Link><button className="icon-button collapse-button" onClick={toggle} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button><button className="icon-button mobile-close" onClick={closeMobile} aria-label="Close menu"><X size={18} /></button></div>
+    <button className="sidebar-search" onClick={search} title="Search"><Search size={17} /><span className="sidebar-label">Search anything</span><kbd className="sidebar-label">⌘ K</kbd></button>
+    <nav aria-label="Main navigation">{sections.map(section => <div className="nav-section" key={section.label}><p className="nav-label sidebar-label">{section.label}</p>{section.items.map(({name,icon: Icon}) => <button key={name} title={name} className={cn('nav-item', view === name && 'active')} onClick={() => {setView(name as View); closeMobile();}} aria-current={view === name ? 'page' : undefined}><Icon size={18} strokeWidth={1.7} /><span className="sidebar-label">{name}</span>{name === 'Today' && <span className="nav-count sidebar-label">{count}</span>}{name === 'Inbox' && <span className="inbox-dot sidebar-label" />}</button>)}</div>)}</nav>
+    <div className="sidebar-bottom"><div className="sidebar-note sidebar-label"><span className="note-spark">✧</span><p>A little focus.<br />A lot of possibility.</p><span>Your next chapter starts today.</span></div><button className="quick-add" onClick={add} title="Quick add task"><Plus size={17} /><span className="sidebar-label">Quick add task</span></button><button className="profile" onClick={() => setView('Settings')} title="Profile settings"><span className="avatar">N</span><span className="profile-copy sidebar-label"><strong>Neha Mary</strong><small>Personal workspace</small></span><ChevronDown size={15} className="sidebar-label" /></button></div>
+  </aside></>;
+}
