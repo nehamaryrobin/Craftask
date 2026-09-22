@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { signInTestUser } from './helpers/auth';
 
 test('empty inbox, inline capture, details, and completion', async ({ page }) => {
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   await expect(page.getByRole('heading', { name: 'Inbox', exact: true })).toBeVisible();
   await expect(page.getByText('Capture now, find your focus later.')).toBeVisible();
   await page.screenshot({path:'/private/tmp/craftask-inbox-empty.png',fullPage:true});
@@ -35,7 +36,7 @@ test('empty inbox, inline capture, details, and completion', async ({ page }) =>
 
 test('inbox composer fits mobile',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   await page.getByRole('button',{name:'Add task',exact:true}).click();
   await page.getByRole('textbox',{name:'Task name'}).fill('Plan a little adventure');
   await page.getByRole('button',{name:'Add task details'}).click();

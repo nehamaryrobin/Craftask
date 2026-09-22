@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { signInTestUser } from './helpers/auth';
 
 test('calendar selection, month navigation, text entry and outside dismissal', async ({page}) => {
   await page.clock.setFixedTime(new Date('2026-09-17T12:00:00'));
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   await page.getByRole('button',{name:'Add task',exact:true}).click();
   await page.getByRole('textbox',{name:'Task name'}).fill('Buy supplies for the road trip');
   await page.getByRole('button',{name:'Task date',exact:true}).click();
@@ -35,7 +36,7 @@ test('calendar selection, month navigation, text entry and outside dismissal', a
 test('mobile quick dates and clearing',async({page})=>{
   await page.clock.setFixedTime(new Date('2026-09-17T12:00:00'));
   await page.setViewportSize({width:390,height:844});
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   await page.getByRole('button',{name:'Add task',exact:true}).click();
   await page.getByRole('button',{name:'Task date',exact:true}).click();
   await page.getByRole('button',{name:'Tomorrow Fri',exact:true}).click();

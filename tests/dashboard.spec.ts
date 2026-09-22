@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { signInTestUser } from './helpers/auth';
 
 test('dashboard layout and task workflows', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   await page.getByRole('button', { name: 'Today', exact: false }).first().click();
-  await expect(page.getByRole('heading', { name: 'Good morning, Neha' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Good morning,/ })).toBeVisible();
   await page.screenshot({ path: '/private/tmp/craftask-desktop.png', fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
   await page.getByRole('button', { name: 'Complete Finish the Craftask dashboard wireframes', exact: true }).click();
@@ -30,7 +31,7 @@ test('dashboard layout and task workflows', async ({ page }) => {
 
 test('mobile navigation and layout', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  await page.goto('http://127.0.0.1:3000');
+  await signInTestUser(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
   await page.screenshot({path:'/private/tmp/craftask-mobile.png',fullPage:true});
   await page.getByRole('button',{name:'Open menu'}).click();
