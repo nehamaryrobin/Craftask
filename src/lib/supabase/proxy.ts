@@ -28,7 +28,11 @@ export async function refreshSupabaseSession(request: NextRequest) {
   });
 
   // This validates an expired token and refreshes the cookie when necessary.
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Supabase backend is unreachable or unconfigured
+  }
 
   return response;
 }

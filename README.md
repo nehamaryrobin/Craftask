@@ -66,7 +66,7 @@ never accepted from request bodies. A task can be attached to a project with
 `projectId`, or kept outside projects with `projectId: null`. Deleting a project
 keeps its tasks and sets their project to `null`.
 
-`GET /api/tasks` accepts optional `projectId`, `scheduledDate`, `isCompleted`,
+`GET /api/tasks` accepts optional `projectId`, `dateToComplete`, `isCompleted`,
 and `matrixQuadrant` query parameters. Use `projectId=none` for tasks that do
 not belong to a project.
 
@@ -76,9 +76,9 @@ The task write shape is:
 {
   "name": "Get the tickets printed",
   "description": null,
-  "scheduledDate": "2026-08-20",
+  "dateToComplete": "2026-08-20",
   "scheduledTime": "10:00",
-  "deadline": "2026-08-23",
+  "dateDeadline": "2026-08-23",
   "matrixQuadrant": "urgent_important",
   "isRecurring": false,
   "recurrenceRule": null,

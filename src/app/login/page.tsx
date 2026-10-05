@@ -11,9 +11,13 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.auth.getUser();
-  if (data.user) redirect('/');
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase.auth.getUser();
+    if (data?.user) redirect('/');
+  } catch {
+    // Ignore fetch error when Supabase is unreachable
+  }
 
   const { error } = await searchParams;
   const initialMessage = error

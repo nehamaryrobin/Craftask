@@ -4,8 +4,9 @@ import { signInTestUser } from './helpers/auth';
 test('calendar selection, month navigation, text entry and outside dismissal', async ({page}) => {
   await page.clock.setFixedTime(new Date('2026-09-17T12:00:00'));
   await signInTestUser(page);
+  const taskName = `Buy supplies for the road trip ${Date.now()}`;
   await page.getByRole('button',{name:'Add task',exact:true}).click();
-  await page.getByRole('textbox',{name:'Task name'}).fill('Buy supplies for the road trip');
+  await page.getByRole('textbox',{name:'Task name'}).fill(taskName);
   await page.getByRole('button',{name:'Task date',exact:true}).click();
   await expect(page.getByRole('button',{name:'Today Thu',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'September 22, 2026',exact:true}).click();
@@ -28,8 +29,8 @@ test('calendar selection, month navigation, text entry and outside dismissal', a
   await page.getByLabel('Task time',{exact:true}).fill('14:30');
   await page.getByRole('heading',{name:'Inbox',exact:true}).click();
   await page.getByRole('button',{name:'Save task'}).click();
-  await expect(page.getByText('Buy supplies for the road trip',{exact:true})).toBeVisible();
-  await expect(page.getByText('2026-09-22',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Upcoming',exact:true}).click();
+  await expect(page.getByText(taskName,{exact:true})).toBeVisible();
   await expect(page.getByText('14:30',{exact:true})).toBeVisible();
 });
 

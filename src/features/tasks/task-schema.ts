@@ -13,13 +13,13 @@ const nullableUuid = z.string().uuid().nullable().optional();
 const taskFields = {
   name: z.string().trim().min(1).max(255),
   description: nullableText(10_000),
-  scheduledDate: z.string().date().nullable().optional(),
+  dateToComplete: z.string().date().nullable().optional(),
   scheduledTime: z
     .string()
     .regex(/^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/, 'Expected HH:mm or HH:mm:ss')
     .nullable()
     .optional(),
-  deadline: z.string().date().nullable().optional(),
+  dateDeadline: z.string().date().nullable().optional(),
   matrixQuadrant: matrixQuadrantSchema.nullable().optional(),
   isRecurring: z.boolean().optional(),
   recurrenceRule: nullableText(1_000),
@@ -27,6 +27,7 @@ const taskFields = {
   location: nullableText(500),
   projectId: nullableUuid,
   parentTaskId: nullableUuid,
+  sortOrder: z.number().finite().optional(),
 };
 
 function validateRecurrence(
@@ -67,7 +68,7 @@ export const taskIdSchema = z.string().uuid();
 export const taskQuerySchema = z
   .object({
     projectId: z.union([z.string().uuid(), z.literal('none')]).optional(),
-    scheduledDate: z.string().date().optional(),
+    dateToComplete: z.string().date().optional(),
     isCompleted: z
       .enum(['true', 'false'])
       .transform((value) => value === 'true')

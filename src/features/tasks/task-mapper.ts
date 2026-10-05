@@ -21,6 +21,7 @@ type TaskRow = {
   parent_task_id: string | null;
   created_at: string;
   updated_at: string;
+  sort_order: number;
 };
 
 export function toTaskDto(row: TaskRow) {
@@ -29,18 +30,19 @@ export function toTaskDto(row: TaskRow) {
     userId: row.user_id,
     name: row.name,
     description: row.description,
-    scheduledDate: row.scheduled_date,
+    dateToComplete: row.scheduled_date,
     scheduledTime: row.scheduled_time,
-    deadline: row.deadline,
+    dateDeadline: row.deadline,
     matrixQuadrant: row.matrix_quadrant,
     isRecurring: row.is_recurring,
     recurrenceRule: row.recurrence_rule,
     isCompleted: row.is_completed,
-    completedAt: row.completed_at,
+    dateCompleted: row.completed_at,
     location: row.location,
     projectId: row.project_id,
     parentTaskId: row.parent_task_id,
-    createdAt: row.created_at,
+    dateCreated: row.created_at,
     updatedAt: row.updated_at,
+    sortOrder: row.sort_order,
   };
 }

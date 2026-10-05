@@ -3,6 +3,7 @@
 import { GripVertical, RotateCcw } from 'lucide-react';
 import type { DragEvent } from 'react';
 import type { MatrixQuadrant, Task } from '@/types/task';
+import { dateKey } from '@/lib/dates';
 
 const quadrants: { id: MatrixQuadrant; number: string; title: string; subtitle: string }[] = [
   { id: 'do-first', number: '01', title: 'Do first', subtitle: 'Urgent & important' },
@@ -17,7 +18,7 @@ type Props = {
 };
 
 export function EisenhowerMatrix({ tasks, assignQuadrant }: Props) {
-  const todayTasks = tasks.filter(task => task.due === 'today');
+  const todayTasks = tasks.filter(task => task.scheduledDate === dateKey(new Date()));
   const move = (event: DragEvent<HTMLElement>, quadrant: MatrixQuadrant | null) => {
     event.preventDefault();
     const id = event.dataTransfer.getData('text/plain');
